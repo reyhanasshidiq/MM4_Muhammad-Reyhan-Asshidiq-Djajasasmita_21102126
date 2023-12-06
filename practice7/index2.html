@@ -100,8 +100,13 @@
                                 <p class="card-text">Buku Sebuah Seni Untuk Bersikap Bodo Amat</p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                                        <button type="button" id="view-detail"
+                                            class="btn btn-sm btn-outline-secondary">View</button>
+                                        <button type="button" id="edit-detail"
+                                            class="btn btn-sm btn-outline-primary">Edit</button>
+                                        <button type="button" id="delete-quote"
+                                            class="btn btn-sm btn-outline-danger">Delete</button>
+
                                     </div>
                                     <small class="text-muted">9 mins</small>
                                 </div>
@@ -125,8 +130,12 @@
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="btn-group">
-                                        <button type="button" id="view-detail" class="btn btn-sm btn-outline-secondary">View</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                                        <button type="button" id="view-detail"
+                                            class="btn btn-sm btn-outline-secondary">View</button>
+                                        <button type="button" id="edit-detail"
+                                            class="btn btn-sm btn-outline-primary">Edit</button>
+                                        <button type="button" id="delete-quote"
+                                            class="btn btn-sm btn-outline-danger">Delete</button>
                                     </div>
                                     <small class="text-muted" id="card-date">9 mins</small>
                                 </div>
@@ -274,80 +283,111 @@
             $("#title-page").html(title);
             $(".quote-item").remove();
 
+            // Aksi Edit
             
-            item.appendTo("#quote-items");
             
-            $.ajax({
-                type: 'GET',
-                url: url,
-                beforeSend: function (xhr) {
-                    xhr.overrideMimeType("text/plain; charset=x-user-defined");
-                },
-                error: function (xhr, status, error) {
-                    console.log(xhr);
-                }
-            })
-                .done(function (data) {
-                    myData = JSON.parse(data);
-                    for (i = 0; i < myData['quotes'].length; i++) {
-                        var item = $("#quote-item").clone();
-                        item.find('#card-description').html(myData['quotes'][i].description);
-                        item.removeAttr("style");
-                        item.find('#card-img').attr('src', myData['quotes'][i].images);
-                        item.find('#card-title').html(myData['quotes'][i].title);
-                        item.find('#card-name').html(myData['quotes'][i].name + " (" + myData['quotes'][i].class + ")");
-                        item.find('#card-date').html(myData['quotes'][i].updated);
-                        item.find('#view-detail').attr("onClick", "callModal('" + myData['quotes'][i].title + "','" + myData['quotes'][i].name + " (" + myData['quotes'][i].class + ")','" + myData['quotes'][i].images + "','" + myData['quotes'][i].description + "')");
-                        item.appendTo("#quote-items");
+            // Aksi Hapus
+
+            // End Aksi Hapus
+
+                item.appendTo("#quote-items");
+
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    beforeSend: function (xhr) {
+                        xhr.overrideMimeType("text/plain; charset=x-user-defined");
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
                     }
+                })
+                    .done(function (data) {
+                        myData = JSON.parse(data);
+                        for (i = 0; i < myData['quotes'].length; i++) {
+                            var item = $("#quote-item").clone();
+                            item.find('#card-description').html(myData['quotes'][i].description);
+                            item.removeAttr("style");
+                            item.find('#card-img').attr('src', myData['quotes'][i].images);
+                            item.find('#card-title').html(myData['quotes'][i].title);
+                            item.find('#card-name').html(myData['quotes'][i].name + " (" + myData['quotes'][i].class + ")");
+                            item.find('#card-date').html(myData['quotes'][i].updated);
+                            item.find('#view-detail').attr("onClick", "callModal('" + myData['quotes'][i].title + "','" + myData['quotes'][i].name + " (" + myData['quotes'][i].class + ")','" + myData['quotes'][i].images + "','" + myData['quotes'][i].description + "')");
+                            item.appendTo("#quote-items");
+                        }
 
+                    });
+            }
+
+            $(document).ready(function () {
+                sessionStorage.setItem("student_id", "1190");
+                sessionStorage.setItem("nim", "21102126");
+                getQuotes('https://quotesbeta.tugaskelas.my.id/index.php/quotes/q/my_quote/' + sessionStorage.getItem("nim"), 'My Quotes');
+
+                $('#modal-input-form').submit(function (e) {
+                    e.preventDefault();
+                    var formData = $(this).serializeArray();
+                    if (formData[0].value == "") {
+                        insertQuote(this);
+                    }
+                    else {
+                        updateQuote(this);
+                    }
                 });
-        }
 
-        $(document).ready(function () {
-            sessionStorage.setItem("student_id", "1190");
-            sessionStorage.setItem("nim", "21102126");
-            getQuotes('https://quotesbeta.tugaskelas.my.id/index.php/quotes/q/my_quote/' + sessionStorage.getItem("nim"), 'My Quotes');
 
-            $('#modal-input-form').submit(function (e) {
-                e.preventDefault();
-                var formData = $(this).serializeArray();
-                if (formData[0].value == "") {
-                    insertQuote(this);
-                }
-                else{
-                    updateQuote(this);
-                }
+                getQuotes('https://quotesbeta.tugaskelas.my.id/index.php/quotes/q/my_quote/21102126', 'My Quotes');
+
             });
 
 
-            getQuotes('https://quotesbeta.tugaskelas.my.id/index.php/quotes/q/my_quote/21102126', 'My Quotes');
+            // Insert Quote
+            function insertQuote(data) {
+                $.ajax({
+                    type: 'POST',
+                    url: "https://quotesbeta.tugaskelas.my.id/index.php/quotes/",
+                    dataType: "JSON",
+                    data: new FormData(data),
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function (xhr) {
+                        xhr.overrideMimeType("text/plain; charset=x-user-defined");
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                    }
+                })
+                    .done(function (data) {
+                        console.log(data);
+                        getQuotes('https://quotesbeta.tugaskelas.my.id/index.php/quotes/q/my_quote/' + sessionStorage.getItem("nim"), 'My Quotes');
+                        $('#quoteInputModal').modal('toggle');
+                    });
+            }
 
-        });
-
-
-        // Insert Quote
-        function insertQuote(data){
-            $.ajax({
-                type: 'POST',
-                url: "https://quotesbeta.tugaskelas.my.id/index.php/quotes/",
-                dataType: "JSON",
-                data: new FormData(data),
-                processData: false,
-                contentType: false,
-                beforeSend: function( xhr ) {
-                    xhr.overrideMimeType("text/plain; charset=x-user-defined");
-                },
-                error: function(xhr, status, error){
-                    console.log(xhr);
-                }
-            })
-            .done(function( data ){
+            // Update Quote
+            function updateQuote(data) {
                 console.log(data);
-                getQuotes('https://quotesbeta.tugaskelas.my.id/index.php/quotes/q/my_quote/'+sessionStorage.getItem("nim"),'My Quotes');
-                $('#quoteInputModal').modal('toggle');
-            });
-        }
+                $.ajax({
+                    type: 'POST',
+                    url: "https://quotesbeta.tugaskelas.my.id/index.php/quotes/q/edit/1",
+                    dataType: "JSON",
+                    data: new FormData(data),
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function (xhr) {
+                        xhr.overrideMimeType("text/plain; charset=x-user-defined");
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                    }
+                })
+
+                    .done(function (data) {
+                        console.log(data);
+                        getQuotes('https://quotesbeta.tugaskelas.my.id/index.php/quotes/q/my_quote/' + sessionStorage.getItem("nim"), 'My Quotes');
+                        $('#quoteInputModal').modal('toggle');
+                    });
+            }
 
     </script>
 

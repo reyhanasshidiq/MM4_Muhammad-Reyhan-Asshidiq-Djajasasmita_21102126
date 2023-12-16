@@ -1,0 +1,43 @@
+<!-- Nama : Muhammad Reyhan Asshidiq Djajasasmita -->
+<!-- NIM : 21102126 -->
+<!-- Kelas : S1-IF-MM4 -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Volume Tabung</title>
+    <link rel="stylesheet" href="css/style_2.css">
+
+</head>
+<body>
+    <div class="calculator">
+        <h2>Kalkulator Volume Tabung</h2>
+        
+        <label for="radius">Jari-jari (cm):</label>
+        <input type="number" id="radius" placeholder="Masukkan jari-jari">
+        <label for="height">Tinggi (cm):</label>
+        <input type="number" id="height" placeholder="Masukkan tinggi">
+        <button onclick="calculateVolume()">Hitung Volume</button>
+        <div id="result"></div>
+        <br>
+    </div>
+
+    <!-- Javascript -->
+    <script>
+        function calculateVolume() {
+            var radius = parseFloat(document.getElementById("radius").value);
+            var height = parseFloat(document.getElementById("height").value);
+            var volume = Math.PI * Math.pow(radius, 2) * height;
+            var result = document.getElementById("result");
+
+            if (isNaN(volume) || radius <= 0 || height <= 0) {
+                result.innerHTML = "Masukkan jari-jari dan tinggi yang valid.";
+            } else {
+                result.innerHTML = "Volume Tabung Anda: " + volume.toFixed(2) + " cm³";
+            }
+        }
+    </script>
+</body>
+</html>
